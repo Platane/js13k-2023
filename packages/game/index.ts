@@ -1,5 +1,3 @@
-console.log("coucou 4");
+import { createRenderer } from "@js13k-2023/renderer";
 
-if (0) {
-  console.log("no");
-}
+console.log("coucou 4");

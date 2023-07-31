@@ -1,8 +1,43 @@
 import { createServer } from "node:http";
 import { buildCss, buildIndexHtml, buildJsCode } from "./utils";
+import chokidar from "chokidar";
+import * as path from "node:path";
 
-// import this so it is watched
-import "../game/index";
+const outDir = path.join(import.meta.dir, "../game");
+
+let onChange: () => void;
+let onChangePromise = new Promise<void>((r) => {
+  onChange = r;
+});
+
+chokidar.watch(outDir).on("all", () => {
+  onChange();
+  onChangePromise = new Promise<void>((r) => {
+    onChange = r;
+  });
+});
+
+const injectWatcher = (html: string) => {
+  function code() {
+    const loop = () => {
+      fetch("/__watcher")
+        .then(async (res) => {
+          if ((await res.text()) === "refresh")
+            setTimeout(() => window.location.reload(), 100);
+
+          loop();
+        })
+        .catch(loop);
+    };
+
+    loop();
+  }
+
+  return html.replace(
+    /<script>/,
+    `<script>;(${code.toString()})()</script><script>`
+  );
+};
 
 const server = createServer(async (req, res) => {
   if (req.url === "/") {
@@ -12,9 +47,10 @@ const server = createServer(async (req, res) => {
     );
     res.end();
   } else if (req.url === "/__watcher") {
-    res.writeHead(200);
-    res.write("ok");
-    setTimeout(() => res.end(), 5 * 60 * 1000);
+    onChangePromise.then(() => {
+      res.writeHead(200);
+      res.end("refresh");
+    });
   } else {
     res.writeHead(404);
     res.end();
@@ -31,23 +67,3 @@ server.listen(3000, () => {
 
   console.log(`serving ${origin}`);
 });
-
-function injectWatcher(html: string) {
-  function code() {
-    const loop = () => {
-      fetch("/__watcher")
-        .catch((err) => {
-          // @ts-ignore
-          setTimeout(() => window.location.reload(), 100);
-        })
-        .then(loop);
-    };
-
-    loop();
-  }
-
-  return html.replace(
-    /<\/script>/,
-    `</script><script>;(${code.toString()})()</script>`
-  );
-}

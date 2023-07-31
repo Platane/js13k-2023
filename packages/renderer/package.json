@@ -1,0 +1,6 @@
+{
+  "name": "@js13k-2023/renderer",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module"
+}

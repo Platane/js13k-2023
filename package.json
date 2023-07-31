@@ -11,13 +11,18 @@
     "bun-types": "0.7.1",
     "lightningcss": "1.21.5",
     "prettier": "3.0.0",
-    "typescript": "5.1.6"
+    "typescript": "5.1.6",
+    "chokidar": "3.5.3"
+  },
+  "dependencies": {
+    "gl-matrix": "3.4.3",
+    "park-miller": "2.0.0"
   },
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
     "build": "bun ./packages/builder/build.ts",
-    "dev": "bun --watch ./packages/builder/dev.ts"
+    "dev": "bun ./packages/builder/dev.ts"
   }
 }
