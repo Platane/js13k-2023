@@ -1,0 +1,6 @@
+{
+  "name": "@js13k-2023/builder",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module"
+}

@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "jsxImportSource": "preact",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "lib": ["es2020", "dom", "WebWorker"],
+    "target": "es2020",
+    "module": "es2022",
+    "types": ["bun-types"]
+  }
+}

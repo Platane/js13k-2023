@@ -1,0 +1,22 @@
+{
+  "name": "js13k-2023",
+  "author": {
+    "name": "platane"
+  },
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "20.4.5",
+    "bun-types": "0.7.1",
+    "prettier": "3.0.0",
+    "typescript": "5.1.6"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "bun ./packages/builder/build.ts",
+    "dev": "bun --watch ./packages/builder/dev.ts"
+  }
+}
