@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { buildIndexHtml, buildJsCode } from "./utils";
+import { buildCss, buildIndexHtml, buildJsCode } from "./utils";
 
 // import this so it is watched
 import "../game/index";
@@ -7,7 +7,9 @@ import "../game/index";
 const server = createServer(async (req, res) => {
   if (req.url === "/") {
     res.writeHead(200, { "content-type": "text/html" });
-    res.write(injectWatcher(buildIndexHtml(await buildJsCode())));
+    res.write(
+      injectWatcher(buildIndexHtml(await buildJsCode(), await buildCss()))
+    );
     res.end();
   } else if (req.url === "/__watcher") {
     res.writeHead(200);

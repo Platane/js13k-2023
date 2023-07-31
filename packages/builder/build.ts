@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { buildIndexHtml, buildJsCode } from "./utils";
+import { buildCss, buildIndexHtml, buildJsCode } from "./utils";
 import { execFileSync } from "node:child_process";
 
 const outDir = path.join(import.meta.dir, "../../dist");
@@ -11,7 +11,10 @@ fs.mkdirSync(outDir, { recursive: true });
 
 fs.writeFileSync(
   path.join(outDir, "index.html"),
-  buildIndexHtml(await buildJsCode({ minify: true }))
+  buildIndexHtml(
+    await buildJsCode({ minify: true }),
+    await buildCss({ minify: true })
+  )
 );
 
 const listFiles = (filename: string): string[] => {
