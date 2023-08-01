@@ -35,18 +35,21 @@ export const buildCss = async ({ minify }: { minify?: boolean } = {}) => {
     }).code.toString();
 };
 
-export const buildIndexHtml = (jsCode: string, cssCode: string = "") =>
-  [
-    "<!DOCTYPE html>",
-    '<html lang="en">',
-    "<head>",
-    '<meta charset="utf-8">',
-    '<meta name="viewport" content="width=device-width">',
-    cssCode ? `<style>${cssCode}</style>` : "",
-    `<script>${jsCode}</script>`,
-    "</head>",
-    "<body>",
-    "<canvas/>",
-    "</body>",
-    "</html>",
-  ].join("");
+export const buildIndexHtml = async (
+  jsCode: string,
+  cssCode: string = "",
+  { minify }: { minify?: boolean } = {}
+) => {
+  let html = (
+    await fs.readFile(path.join(import.meta.dir, "/../game/index.html"))
+  ).toString();
+
+  html = html.replace("</body>", `<script>${jsCode}</script></body>`);
+
+  if (cssCode)
+    html = html.replace("</head>", `<style>${cssCode}</style></head>`);
+
+  if (minify) html = html.replace(/\>\s+\</g, "><");
+
+  return html;
+};

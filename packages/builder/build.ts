@@ -11,9 +11,10 @@ fs.mkdirSync(outDir, { recursive: true });
 
 fs.writeFileSync(
   path.join(outDir, "index.html"),
-  buildIndexHtml(
+  await buildIndexHtml(
     await buildJsCode({ minify: true }),
-    await buildCss({ minify: true })
+    await buildCss({ minify: true }),
+    { minify: true }
   )
 );
 

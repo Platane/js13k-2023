@@ -43,7 +43,7 @@ const server = createServer(async (req, res) => {
   if (req.url === "/") {
     res.writeHead(200, { "content-type": "text/html" });
     res.write(
-      injectWatcher(buildIndexHtml(await buildJsCode(), await buildCss()))
+      injectWatcher(await buildIndexHtml(await buildJsCode(), await buildCss()))
     );
     res.end();
   } else if (req.url === "/__watcher") {
