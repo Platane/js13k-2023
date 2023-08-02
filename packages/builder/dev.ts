@@ -19,15 +19,21 @@ chokidar.watch(outDir).on("all", () => {
 
 const injectWatcher = (html: string) => {
   function code() {
+    let delay = 0;
+
     const loop = () => {
       fetch("/__watcher")
         .then(async (res) => {
+          delay = 0;
           if ((await res.text()) === "refresh")
             setTimeout(() => window.location.reload(), 100);
 
           loop();
         })
-        .catch(loop);
+        .catch(() => {
+          setTimeout(loop, delay);
+          delay = Math.min(5000, delay * 2 + 100);
+        });
     };
 
     loop();

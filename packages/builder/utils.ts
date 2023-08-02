@@ -1,7 +1,10 @@
+/// <reference types="bun-types" />
+
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { tmpdir } from "node:os";
 import { transform } from "lightningcss";
+import { shaderLoaderPlugin } from "./plugins/shader-loader";
 
 export const createTmpDir = () => fs.mkdtemp(path.join(tmpdir(), "js13k-"));
 
@@ -13,7 +16,12 @@ export const buildJsCode = async ({ minify }: { minify?: boolean } = {}) => {
     outdir,
     target: "browser",
     minify,
+    define: { "process.env.NODE_ENV": minify ? '"dev"' : '"production"' },
+    loader: { ".frag": "text", ".vert": "text" },
+    plugins: [shaderLoaderPlugin],
   });
+
+  if (!res.success) console.log(res);
 
   const index = res.outputs.find((o) => o.path.endsWith("index.js"))!;
 

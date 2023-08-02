@@ -1,3 +1,3 @@
-import { createRenderer } from "@js13k-2023/renderer";
+import { render } from "@js13k-2023/renderer";
 
-console.log("coucou 4");
+render();
