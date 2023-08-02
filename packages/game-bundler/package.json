@@ -1,5 +1,5 @@
 {
-  "name": "@js13k-2023/builder",
+  "name": "@js13k-2023/game-bundler",
   "version": "0.0.1",
   "private": true,
   "type": "module",

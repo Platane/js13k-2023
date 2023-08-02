@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "gl-matrix": "3.4.3",
-    "bun-types": "0.7.1"
+    "gl-matrix": "3.4.3"
   }
 }
