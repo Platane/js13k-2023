@@ -1,4 +1,3 @@
-import { createServer } from "node:http";
 import { buildCss, buildIndexHtml, buildJsCode } from "./utils";
 import chokidar from "chokidar";
 import * as path from "node:path";
@@ -40,36 +39,30 @@ const injectWatcher = (html: string) => {
   }
 
   return html.replace(
-    /<script>/,
-    `<script>;(${code.toString()})()</script><script>`
+    /<\/head>/,
+    `<script>;(${code.toString()})()</script></head>`
   );
 };
 
-const server = createServer(async (req, res) => {
-  if (req.url === "/") {
-    res.writeHead(200, { "content-type": "text/html" });
-    res.write(
-      injectWatcher(await buildIndexHtml(await buildJsCode(), await buildCss()))
-    );
-    res.end();
-  } else if (req.url === "/__watcher") {
-    onChangePromise.then(() => {
-      res.writeHead(200);
-      res.end("refresh");
-    });
-  } else {
-    res.writeHead(404);
-    res.end();
-  }
-});
+Bun.serve({
+  async fetch(req) {
+    const { pathname } = new URL(req.url);
 
-server.listen(3000, () => {
-  const a = server.address() as any;
+    if (pathname === "/") {
+      const payload = injectWatcher(
+        await buildIndexHtml(await buildJsCode(), await buildCss())
+      );
+      return new Response(payload, {
+        headers: { "content-type": "text/html" },
+      });
+    }
 
-  const origin =
-    (a.family === "IPv6" && `http://[${a.address}]:${a.port}`) ||
-    (a.family === "IPv4" && `http://${a.address}:${a.port}`) ||
-    JSON.stringify(a);
+    if (pathname === "/__watcher") {
+      await onChangePromise;
 
-  console.log(`serving ${origin}`);
+      return new Response("refresh");
+    }
+
+    return new Response("", { status: 404 });
+  },
 });
