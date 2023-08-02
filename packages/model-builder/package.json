@@ -1,0 +1,11 @@
+{
+  "name": "@js13k-2023/model-builder",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@types/three": "0.155.0",
+    "three": "0.155.0",
+    "three-stdlib": "2.24.1"
+  }
+}

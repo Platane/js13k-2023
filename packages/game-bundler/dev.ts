@@ -48,9 +48,14 @@ Bun.serve({
   async fetch(req) {
     const { pathname } = new URL(req.url);
 
+    const assets = await buildJsCode();
+
+    if (pathname.slice(1) in assets)
+      return new Response(assets[pathname.slice(1)]);
+
     if (pathname === "/") {
       const payload = injectWatcher(
-        await buildIndexHtml(await buildJsCode(), await buildCss())
+        await buildIndexHtml(assets["index.js"], await buildCss())
       );
       return new Response(payload, {
         headers: { "content-type": "text/html" },

@@ -1,6 +1,7 @@
 import { gl } from "./canvas";
 import { draw as drawGizmo } from "./materials/gizmo";
-import { onResize as onResizeCamera } from "./entities/camera";
+import { draw as drawBasic } from "./materials/basic";
+import { onResize as onResizeCamera } from "../entities/camera";
 import { onResize as onResizeCanvas } from "./canvas";
 
 gl.clearColor(0, 0, 0, 0);
@@ -13,6 +14,7 @@ export const render = () => {
   // clear canvas
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+  drawBasic();
   drawGizmo();
 };
 

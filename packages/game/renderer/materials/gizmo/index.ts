@@ -1,5 +1,5 @@
 import { gl } from "../../canvas";
-import { worldMatrix } from "../../entities/camera";
+import { worldMatrix } from "../../../entities/camera";
 import { createProgram } from "../../utils/program";
 import codeFrag from "./shader.frag";
 import codeVert from "./shader.vert";
@@ -23,7 +23,7 @@ gl.bindVertexArray(vao);
 //
 var positionBuffer = gl.createBuffer();
 
-const lll = 0.35;
+const lll = 1;
 
 const positions = [
   [0.0, lll, 0.0],

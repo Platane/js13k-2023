@@ -6,10 +6,6 @@
   "dependencies": {
     "bun": "0.7.1",
     "chokidar": "3.5.3",
-    "lightningcss": "1.21.5",
-    "advzip-bin": "2.0.0"
-  },
-  "trustedDependencies": [
-    "advzip-bin"
-  ]
+    "lightningcss": "1.21.5"
+  }
 }

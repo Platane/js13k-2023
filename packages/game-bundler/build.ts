@@ -9,14 +9,16 @@ fs.rmdirSync(outDir, { recursive: true });
 
 fs.mkdirSync(outDir, { recursive: true });
 
+const assets = await buildJsCode({ minify: true });
 fs.writeFileSync(
   path.join(outDir, "index.html"),
-  await buildIndexHtml(
-    await buildJsCode({ minify: true }),
-    await buildCss({ minify: true }),
-    { minify: true }
-  )
+  await buildIndexHtml(assets["index.js"], await buildCss({ minify: true }), {
+    minify: true,
+  })
 );
+for (const [key, content] of Object.entries(assets)) {
+  if (key !== "index.js") fs.writeFileSync(path.join(outDir, key), content);
+}
 
 const listFiles = (filename: string): string[] => {
   const stat = fs.statSync(filename);

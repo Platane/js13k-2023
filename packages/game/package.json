@@ -2,5 +2,8 @@
   "name": "@js13k-2023/game",
   "version": "0.0.1",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "gl-matrix": "3.4.3"
+  }
 }

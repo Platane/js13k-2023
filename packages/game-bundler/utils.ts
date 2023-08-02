@@ -16,16 +16,24 @@ export const buildJsCode = async ({ minify }: { minify?: boolean } = {}) => {
     outdir,
     target: "browser",
     minify,
-    define: { "process.env.NODE_ENV": minify ? '"dev"' : '"production"' },
+    define: { "process.env.NODE_ENV": minify ? '"production"' : '"dev"' },
     loader: { ".frag": "text", ".vert": "text" },
     plugins: [shaderLoaderPlugin],
+    naming: {
+      asset: "[hash].[ext]",
+    },
   });
 
   if (!res.success) console.log(res);
 
-  const index = res.outputs.find((o) => o.path.endsWith("index.js"))!;
-
-  return index.text();
+  return Object.fromEntries(
+    await Promise.all(
+      res.outputs.map(async (o) => [
+        path.relative(outdir, o.path),
+        o.type.startsWith("text/") ? await o.text() : await o.arrayBuffer(),
+      ])
+    )
+  ) as { "index.js": string } & Record<string, string | ArrayBuffer>;
 };
 
 export const buildCss = async ({ minify }: { minify?: boolean } = {}) => {

@@ -1,3 +1,3 @@
-import { render } from "@js13k-2023/renderer";
+import { render } from "./renderer";
 
 render();

@@ -1,5 +1,5 @@
 import { mat4, vec3, mat3 } from "gl-matrix";
-import { canvas } from "../canvas";
+import { canvas } from "../renderer/canvas";
 import { mat4FromMat3 } from "../utils/mat4";
 
 const maxZoom = 10;
