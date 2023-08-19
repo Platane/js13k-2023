@@ -1,6 +1,7 @@
-import { buildCss, buildIndexHtml, buildJsCode } from "./utils";
 import chokidar from "chokidar";
 import * as path from "node:path";
+import * as fs from "node:fs";
+import { build } from "./build";
 
 const outDir = path.join(import.meta.dir, "../game");
 
@@ -39,7 +40,7 @@ const injectWatcher = (html: string) => {
   }
 
   return html.replace(
-    /<\/head>/,
+    "</head>",
     `<script>;(${code.toString()})()</script></head>`
   );
 };
@@ -48,26 +49,34 @@ Bun.serve({
   async fetch(req) {
     const { pathname } = new URL(req.url);
 
-    const assets = await buildJsCode();
-
-    if (pathname.slice(1) in assets)
-      return new Response(assets[pathname.slice(1)]);
-
-    if (pathname === "/") {
-      const payload = injectWatcher(
-        await buildIndexHtml(assets["index.js"], await buildCss())
-      );
-      return new Response(payload, {
-        headers: { "content-type": "text/html" },
-      });
-    }
-
     if (pathname === "/__watcher") {
       await onChangePromise;
 
       return new Response("refresh");
     }
 
-    return new Response("", { status: 404 });
+    const a = performance.now();
+    await build();
+
+    console.log("build in ", performance.now() - a, "ms");
+
+    const assetName = path.join(
+      __dirname,
+      "..",
+      "..",
+      "dist",
+      pathname === "/" ? "index.html" : pathname.slice(1)
+    );
+
+    if (!fs.existsSync(assetName)) return new Response("", { status: 404 });
+
+    const content = fs.readFileSync(assetName);
+
+    if (path.extname(assetName) === ".html")
+      return new Response(injectWatcher(content.toString()), {
+        headers: { "content-type": "text/html" },
+      });
+
+    return new Response(content);
   },
 });

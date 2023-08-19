@@ -1,54 +1,55 @@
-import * as fs from "node:fs";
-import * as path from "node:path";
-import { buildCss, buildIndexHtml, buildJsCode } from "./utils";
-import { execFileSync } from "node:child_process";
+import * as fs from "fs";
+import * as path from "path";
+import { rollup } from "rollup";
+import { minify as minifyHtml } from "html-minifier-terser";
+import { minify as minifyJs } from "terser";
+import {
+  createRollupInputOptions,
+  minifyHtmlOptions,
+  rollupOutputOptions,
+  terserOptions,
+} from "./rollup-config";
+import { transform } from "lightningcss";
 
-const outDir = path.join(import.meta.dir, "../../dist");
+export const build = async (minify = false) => {
+  // bundle with rollup
+  const bundle = await rollup(createRollupInputOptions(minify));
+  let {
+    output: [{ code: jsCode }],
+  } = await bundle.generate(rollupOutputOptions);
 
-fs.rmdirSync(outDir, { recursive: true });
+  let cssCode = fs
+    .readFileSync(path.join(__dirname, "..", "game", "index.css"))
+    .toString();
 
-fs.mkdirSync(outDir, { recursive: true });
+  // minify with terser
+  if (minify) {
+    const out = await minifyJs(jsCode, terserOptions);
+    jsCode = out.code!;
 
-const assets = await buildJsCode({ minify: true });
-fs.writeFileSync(
-  path.join(outDir, "index.html"),
-  await buildIndexHtml(assets["index.js"], await buildCss({ minify: true }), {
-    minify: true,
-  })
-);
-for (const [key, content] of Object.entries(assets)) {
-  if (key !== "index.js") fs.writeFileSync(path.join(outDir, key), content);
-}
+    cssCode = transform({
+      filename: "style.css",
+      code: Buffer.from(cssCode),
+      minify: true,
+      sourceMap: false,
+    }).code.toString();
+  }
 
-const listFiles = (filename: string): string[] => {
-  const stat = fs.statSync(filename);
-  if (stat.isFile()) return [filename];
-  if (stat.isDirectory())
-    return fs
-      .readdirSync(filename)
-      .map((f) => listFiles(path.join(filename, f)))
-      .flat();
-  return [];
+  const htmlTemplate = fs
+    .readFileSync(path.join(__dirname, "..", "game", "index.html"))
+    .toString();
+
+  let htmlContent = htmlTemplate
+    .replace("</body>", `<script>${jsCode}</script></body>`)
+    .replace("</head>", `<style>${cssCode}</style></head>`);
+
+  if (minify) htmlContent = await minifyHtml(htmlContent, minifyHtmlOptions);
+
+  const distDir = path.join(__dirname, "..", "..", "dist");
+  try {
+    fs.rmSync(distDir, { recursive: true });
+  } catch (err) {}
+  fs.mkdirSync(distDir, { recursive: true });
+
+  fs.writeFileSync(path.join(distDir, "index.html"), htmlContent);
 };
-
-execFileSync("advzip", [
-  "--add",
-  "--shrink-insane",
-  path.join(outDir, "bundle.zip"),
-  ...listFiles(outDir),
-]);
-
-//
-// write size info
-{
-  const size = fs.statSync(path.join(outDir, "bundle.zip")).size;
-  const literalSize = (size / 1024).toFixed(2) + "K";
-  const content = {
-    label: "size",
-    message: literalSize,
-    color: size < 13312 ? "success" : "important",
-  };
-  fs.writeFileSync("dist/shieldio_size.json", JSON.stringify(content));
-
-  console.log(literalSize);
-}
