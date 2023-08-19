@@ -72,9 +72,7 @@ export const createRollupInputOptions = (production: boolean) =>
     ],
   }) as InputOptions;
 
-export const rollupOutputOptions: RollupOptions = {
-  output: {
+export const rollupOutputOptions: RollupOptions['output'] = {
     format: "es",
     sourcemap: false,
-  },
 };
