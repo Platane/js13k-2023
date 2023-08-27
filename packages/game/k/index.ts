@@ -1,12 +1,13 @@
-import { createRenderer } from "./render";
+import { render as renderCanvas } from "./render-canvas";
+import { render as renderOverlay } from "./render-overlay";
 import { update } from "./update";
 import "./controls";
 
-const render = createRenderer();
-
 const loop = () => {
   update();
-  render();
+
+  renderOverlay();
+  renderCanvas();
 
   requestAnimationFrame(loop);
 };

@@ -55,8 +55,10 @@ export const crates = [
 //
 
 export const ui = {
-  selected: null as null | number[],
-  selectedType: null as null | "town" | "worker",
+  selected: null as
+    | null
+    | { type: "worker"; ids: number[] }
+    | { type: "town"; id: number },
 
   selectionRectStartDate: 0,
   selectionRect: null as

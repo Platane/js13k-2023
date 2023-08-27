@@ -1,15 +1,10 @@
 import { cells, fields, towns, ui, workers } from "./data";
+import { unproject } from "./render-canvas";
 
 const canvas: HTMLCanvasElement = document.getElementsByTagName("canvas")[0];
 
-const getCoord = ({ pageX, pageY }: { pageX: number; pageY: number }) => {
-  const r = Math.min(canvas.width, canvas.height);
-
-  const x = (pageX / r) * 100 - 5;
-  const y = (pageY / r) * 100 - 5;
-
-  return { x, y };
-};
+const getCoord = ({ pageX, pageY }: { pageX: number; pageY: number }) =>
+  unproject(pageX, pageY);
 
 const pickCell = (x: number, y: number) => {
   const cx = Math.round(x);
@@ -30,7 +25,7 @@ canvas.addEventListener("mousedown", (e) => {
 
   const selected = ui.selected;
 
-  if (e.button === 2 && selected && (selected?.length ?? 0) > 0) {
+  if (e.button === 2 && selected?.type === "worker") {
     const { x, y } = getCoord(e);
     const cell_i = pickCell(x, y);
 
@@ -38,7 +33,7 @@ canvas.addEventListener("mousedown", (e) => {
       const field_i = fields.findIndex((f) => f.cell === cell_i);
 
       if (field_i !== null) {
-        for (const i of selected) {
+        for (const i of selected.ids) {
           workers[i].job = "go-to-field";
           workers[i].field = field_i;
         }
@@ -47,7 +42,7 @@ canvas.addEventListener("mousedown", (e) => {
       }
     }
 
-    for (const i of selected) {
+    for (const i of selected.ids) {
       workers[i].job = "go-to";
       workers[i].target_x = x;
       workers[i].target_y = y;
@@ -65,7 +60,6 @@ canvas.addEventListener("mouseup", (e) => {
   if (ui.selectionRect) {
     const duration = e.timeStamp - ui.selectionRectStartDate;
 
-    const selected = [];
     let minx = Math.min(ui.selectionRect[0].x, ui.selectionRect[1].x);
     let maxx = Math.max(ui.selectionRect[0].x, ui.selectionRect[1].x);
     let miny = Math.min(ui.selectionRect[0].y, ui.selectionRect[1].y);
@@ -80,27 +74,29 @@ canvas.addEventListener("mouseup", (e) => {
 
     ui.selectionRect = null;
 
-    for (let i = workers.length; i--; ) {
-      const { x, y } = workers[i];
+    // select workers
+    {
+      ui.selected = null;
+      const selected = [];
+      for (let i = workers.length; i--; ) {
+        const { x, y } = workers[i];
 
-      if (minx <= x && x <= maxx && miny <= y && y <= maxy) selected.push(i);
-    }
-    if (selected.length > 0) {
-      ui.selected = selected;
-      ui.selectedType = "worker";
-      return;
+        if (minx <= x && x <= maxx && miny <= y && y <= maxy) selected.push(i);
+      }
+      if (selected.length > 0) {
+        ui.selected = { type: "worker", ids: selected };
+        return;
+      }
     }
 
+    // select town
     for (let i = towns.length; i--; ) {
       const { x, y } = cells[towns[i].cell];
 
-      if (minx <= x && x <= maxx && miny <= y && y <= maxy) selected.push(i);
-    }
-    if (selected.length > 0) {
-      selected.length = 1;
-      ui.selected = selected;
-      ui.selectedType = "town";
-      return;
+      if (minx <= x && x <= maxx && miny <= y && y <= maxy) {
+        ui.selected = { type: "town", id: i };
+        return;
+      }
     }
   }
 });
