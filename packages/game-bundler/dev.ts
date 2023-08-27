@@ -55,10 +55,11 @@ Bun.serve({
       return new Response("refresh");
     }
 
-    const a = performance.now();
-    await build();
-
-    console.log("build in ", performance.now() - a, "ms");
+    try {
+      const a = performance.now();
+      await build();
+      console.log("build in ", performance.now() - a, "ms");
+    } catch (err) {}
 
     const assetName = path.join(
       __dirname,
