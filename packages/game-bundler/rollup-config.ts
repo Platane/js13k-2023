@@ -48,7 +48,7 @@ export const createRollupInputOptions = (production: boolean) =>
         include: ["**/*.ts"],
         exclude: /node_modules/,
         sourceMap: false,
-        target: "es2020",
+        target: "es2022",
         define: {
           "process.env.NODE_ENV": production ? '"production"' : '"dev"',
         },
@@ -59,20 +59,20 @@ export const createRollupInputOptions = (production: boolean) =>
         compress: production,
       }),
 
-      ...(production
-        ? [
-            compiler({
-              language_in: "ECMASCRIPT_2020",
-              language_out: "ECMASCRIPT_2020",
-              compilation_level: "ADVANCED",
-              // assume_function_wrapper: true,
-            }),
-          ]
-        : []),
+      // ...(production
+      //   ? [
+      //       compiler({
+      //         language_in: "ECMASCRIPT_2020",
+      //         language_out: "ECMASCRIPT_2020",
+      //         compilation_level: "ADVANCED",
+      //         // assume_function_wrapper: true,
+      //       }),
+      //     ]
+      //   : []),
     ],
   }) as InputOptions;
 
-export const rollupOutputOptions: RollupOptions['output'] = {
-    format: "es",
-    sourcemap: false,
+export const rollupOutputOptions: RollupOptions["output"] = {
+  format: "es",
+  sourcemap: false,
 };
