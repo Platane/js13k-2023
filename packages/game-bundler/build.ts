@@ -26,22 +26,31 @@ export const build = async (minify = false) => {
   if (minify) {
     const out = await minifyJs(jsCode, terserOptions);
     jsCode = out.code!;
+  }
 
+  if (minify)
     cssCode = transform({
       filename: "style.css",
       code: Buffer.from(cssCode),
       minify: true,
       sourceMap: false,
     }).code.toString();
-  }
 
-  const htmlTemplate = fs
+  let htmlContent = fs
     .readFileSync(path.join(__dirname, "..", "game", "index.html"))
     .toString();
 
-  let htmlContent = htmlTemplate
-    .replace("</body>", `<script>${jsCode}</script></body>`)
-    .replace("</head>", `<style>${cssCode}</style></head>`);
+  htmlContent = replace(
+    htmlContent,
+    "</body>",
+    `</body><script>${jsCode}</script>`
+  );
+
+  htmlContent = replace(
+    htmlContent,
+    "</head>",
+    `<style>${cssCode}</style></head>`
+  );
 
   if (minify) htmlContent = await minifyHtml(htmlContent, minifyHtmlOptions);
 
@@ -52,4 +61,9 @@ export const build = async (minify = false) => {
   fs.mkdirSync(distDir, { recursive: true });
 
   fs.writeFileSync(path.join(distDir, "index.html"), htmlContent);
+};
+
+const replace = (text: string, pattern: string, replace: string) => {
+  const [before, after] = text.split(pattern);
+  return before + replace + after;
 };
