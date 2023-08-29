@@ -6,9 +6,9 @@ const canvas: HTMLCanvasElement = document.getElementsByTagName("canvas")[0];
 const getCoord = ({ pageX, pageY }: { pageX: number; pageY: number }) =>
   unproject(pageX, pageY);
 
-const pickCell = (x: number, y: number) => {
-  const cx = Math.round(x);
-  const cy = Math.round(y);
+export const pickCell = (x: number, y: number) => {
+  const cx = Math.round(x / 10) * 10;
+  const cy = Math.round(y / 10) * 10;
 
   const i = cells.findIndex((c) => c.x === cx && c.y === cy);
   return i === -1 ? null : i;
@@ -32,7 +32,7 @@ canvas.addEventListener("mousedown", (e) => {
     if (cell_i !== null) {
       const field_i = fields.findIndex((f) => f.cell === cell_i);
 
-      if (field_i !== null) {
+      if (field_i !== -1) {
         for (const i of selected.ids) {
           workers[i].job = "go-to-field";
           workers[i].field = field_i;

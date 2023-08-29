@@ -1,4 +1,5 @@
 import { MAX_GROWTH, WORKER_SPEED } from "./const";
+import { pickCell } from "./controls";
 import { cells, crates, fields, workers } from "./data";
 
 export const update = () => {
@@ -50,6 +51,13 @@ export const update = () => {
         w.x += (dx * WORKER_SPEED) / l;
         w.y += (dy * WORKER_SPEED) / l;
       }
+    }
+
+    if (
+      w.job === "go-to-field" &&
+      fields[w.field].cell === pickCell(w.x, w.y)
+    ) {
+      w.job = "work-field";
     }
 
     //

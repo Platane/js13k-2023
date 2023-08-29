@@ -14,7 +14,9 @@ export const fields = [
   { cell: 43, town: 0, growth: 0 },
 ];
 
-type W = { x: number; y: number } & { carrying: null | number } & (
+type W = { x: number; y: number } & { carrying: null | number } & {
+  hunger: number;
+} & (
     | {
         job: "work-field";
         field: number;
@@ -35,11 +37,13 @@ export const workers: W[] = [
     x: 12,
     y: 10,
     carrying: 0,
+    hunger: 0,
     job: "idle",
   },
   {
     x: 15,
     y: 12,
+    hunger: 0,
     carrying: null,
     job: "idle",
   },
