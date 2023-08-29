@@ -1,5 +1,5 @@
 import { render as renderCanvas } from "./render-canvas";
-import { render as renderOverlay } from "./render-overlay";
+import { render as renderOverlay } from "./ui/render";
 import { update } from "./update";
 import "./controls";
 
