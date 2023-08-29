@@ -5,7 +5,7 @@ import { project } from "../render-canvas";
 const container = document.querySelector("#overlay") as HTMLDivElement;
 
 let type: NonNullable<typeof ui.selected>["type"] | undefined = undefined;
-let current: { update: (x: any) => void; el: HTMLElement } | undefined;
+let current: { update: () => void; el: HTMLElement } | undefined;
 
 export const render = () => {
   if (type !== ui.selected?.type) {
@@ -13,14 +13,14 @@ export const render = () => {
 
     type = ui.selected?.type;
     current =
-      (ui.selected?.type === "town" && createTownUi()) ||
-      (ui.selected?.type === "worker" && createWorkerUi()) ||
+      (type === "town" && createTownUi()) ||
+      (type === "worker" && createWorkerUi()) ||
       undefined;
 
     if (current?.el) container.appendChild(current.el);
   }
 
-  current?.update?.(ui.selected);
+  current?.update?.();
 };
 
 const createWorkerUi = () => {
@@ -31,12 +31,15 @@ const createWorkerUi = () => {
 
   const label = el.querySelector(".label") as HTMLSpanElement;
 
-  const update = (
-    selected: Extract<typeof ui.selected, { type: "worker" }>
-  ) => {
+  const update = () => {
     //
     // render
     //
+
+    const selected = ui.selected as Extract<
+      typeof ui.selected,
+      { type: "worker" }
+    >;
 
     label.innerText = `${selected.ids.length} worker selected`;
 
@@ -74,16 +77,26 @@ const createTownUi = () => {
     .children[0] as HTMLElement;
 
   const label = el.querySelector(".label") as HTMLSpanElement;
-  const button = el.querySelector(".add_shit") as HTMLButtonElement;
+  const button = el.querySelector(".add_worker") as HTMLButtonElement;
 
   button.addEventListener("click", () => {
-    console.log("hola");
+    const selected = ui.selected as Extract<
+      typeof ui.selected,
+      { type: "town" }
+    >;
+
+    towns[selected.id].unit_queue.push({ unit: "worker", growth: 0 });
   });
 
-  const update = (selected: Extract<typeof ui.selected, { type: "town" }>) => {
+  const update = () => {
     //
     // render
     //
+
+    const selected = ui.selected as Extract<
+      typeof ui.selected,
+      { type: "town" }
+    >;
 
     let n_fields = 0;
     let n_peon = 0;
