@@ -1,7 +1,7 @@
 import * as path from "path";
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
-import { InputOptions, RollupOptions } from "rollup";
+import { InputOptions, OutputOptions } from "rollup";
 import { MinifyOptions } from "terser";
 import compiler from "@ampproject/rollup-plugin-closure-compiler";
 import esbuild from "rollup-plugin-esbuild";
@@ -72,7 +72,7 @@ export const createRollupInputOptions = (production: boolean) =>
     ],
   }) as InputOptions;
 
-export const rollupOutputOptions: RollupOptions["output"] = {
+export const rollupOutputOptions = {
   format: "es",
   sourcemap: false,
-};
+} satisfies OutputOptions;
