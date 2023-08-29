@@ -50,19 +50,20 @@ jobs:
 
       - run: tar -xvf artifact.tar
 
-      - run: ls .
-
       - name: test the bundle against the report endpoint
         run: |
           curl --silent -X POST --max-time 120 --connect-timeout 120 --form bundle=@bundle.zip --form category=desktop https://iw8sii1h9b.execute-api.eu-west-1.amazonaws.com/stage/analyze-bundle > report.json
-          node -e "console.log(JSON.stringify(require('./report.json'),null,2))"
 
       - name: fails if the report failed
         uses: actions/github-script@v6
         with:
           script: |
-            for (const c of require('./report.json').checks)
-              if(c.result!=='ok'){
+            const report = require("./report.json");
+
+            console.log(JSON.stringify(report, null, 2));
+
+            for (const c of require("./report.json").checks)
+              if (c.result !== "ok") {
                 console.error(c);
                 throw c.description;
               }
