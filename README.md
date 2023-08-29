@@ -16,3 +16,10 @@ npm run dev
 npm run build
 
 ```
+
+# Todo
+
+- [ ] town hall creation queue
+- [ ] unit hunger
+- [ ] irregular cells
+- [ ] solid terrain obstacle
