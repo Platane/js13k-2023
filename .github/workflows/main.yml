@@ -48,7 +48,9 @@ jobs:
         with:
           name: github-pages
 
-      - run: ls .
+      - run: tar -xvf artifact.tar
+
+      - run: ls
 
       - name: test the bundle against the report endpoint
         run: |
